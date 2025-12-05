@@ -1,8 +1,10 @@
 body {
   margin: 0;
   padding: 0;
-  height: 15vh;                 /* full viewport */
+  min-height: 100vh;           /* full page */
+  font-family: Arial, sans-serif;
 }
+
 
 /* MAIN TABLE */
 .main-table {
@@ -30,6 +32,13 @@ body {
   margin-right: 10px;
   border-radius: 3px;
   border: black 2px solid;
+  cursor: pointer;                 /* NEW: clickable */
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.student-img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
 }
 
 .header-left {
@@ -61,8 +70,9 @@ body {
   background-color: #bebebe;
   text-align: center;
   padding: 10px;
-  height: 24px;
+  /* height: 24px;  remove fixed height */
 }
+
 
 .navbar a {
   text-decoration: none;
@@ -128,4 +138,13 @@ form input[type="submit"]:hover {
   max-height: 546px;
   overflow-y: auto;     /* Scroll if content is long */
   background-color: #fff;
+}
+
+.header-status {
+  margin-top: 6px;
+  font-size: 14px;
+}
+
+.header-status span {
+  font-weight: bold;
 }

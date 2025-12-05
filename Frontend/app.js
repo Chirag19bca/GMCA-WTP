@@ -1,5 +1,9 @@
 var app = angular.module("myApp", ["ngRoute"]);
-
+app.run(function ($rootScope) {
+  $rootScope.isLoggedIn = false;
+  $rootScope.currentUserName = "";
+});
+// =============== ROUTING ===============
 app.config(function ($routeProvider) {
   $routeProvider
     .when("/home", {
@@ -43,7 +47,6 @@ app.config(function ($routeProvider) {
 
 // =============== PROFILE CONTROLLER ===============
 app.controller("profileCtrl", function ($scope, $http, $location) {
-
   $scope.loading = true;
   $scope.profile = null;
   $scope.errorMsg = "";
@@ -62,7 +65,6 @@ app.controller("profileCtrl", function ($scope, $http, $location) {
       $scope.loading = false;
     }
   );
-
 });
 
 // =============== STUDENT FORM CONTROLLER ===============
@@ -110,7 +112,7 @@ app.controller("studentFormCtrl", function ($scope, $http, $location) {
 });
 
 // =============== LOGIN CONTROLLER ===============
-app.controller("loginCtrl", function ($scope, $http, $location) {
+app.controller("loginCtrl", function ($scope, $http, $location, $rootScope) {
   $scope.loginData = {};
   $scope.errorMsg = "";
 
@@ -121,129 +123,165 @@ app.controller("loginCtrl", function ($scope, $http, $location) {
       function (response) {
         var data = response.data;
 
-        if (data && data.success === false) {
-          $scope.errorMsg = data.message; // visible text
-          return;
+        // adjust this condition to match your real response
+        if (data === "Login successful" || data.success) {
+          // re-sync from PHP so header shows correct name
+          $http.get("../Backend/get_profile.php").then(function (res2) {
+            if (res2.data !== "NOT_LOGGED_IN") {
+              $rootScope.isLoggedIn = true;
+              $rootScope.currentUserName = (
+                (res2.data.fname || "") +
+                " " +
+                (res2.data.lname || "")
+              ).trim();
+            }
+            $location.path("/profile");
+          });
+        } else {
+          alert("Invalid credentials");
         }
-
-        $http.get("../Backend/get_profile.php").then(function () {
-          $location.path("/profile");
-        });
       },
       function () {
-        $scope.errorMsg = "Server error while logging in.";
+        alert("Server error");
       }
     );
   };
 });
 
-
-
 // =============== REGISTER CONTROLLER ===============
-app.controller("registerCtrl", function (
-  $scope,
-  $http,
-  $location,
-  $httpParamSerializerJQLike
-) {
-  $scope.register = {};
-  $scope.successMsg = "";
-  $scope.errorMsg = "";
-
-  $scope.doRegister = function () {
+app.controller(
+  "registerCtrl",
+  function ($scope, $http, $location, $httpParamSerializerJQLike) {
+    $scope.register = {};
     $scope.successMsg = "";
     $scope.errorMsg = "";
 
-    // run JS validation (from register.js)
-    if (typeof validateRegisterFormOnSubmit === "function") {
-      const ok = validateRegisterFormOnSubmit();
-      if (!ok) return;
+    $scope.doRegister = function () {
+      $scope.successMsg = "";
+      $scope.errorMsg = "";
+
+      // run JS validation (from register.js)
+      if (typeof validateRegisterFormOnSubmit === "function") {
+        const ok = validateRegisterFormOnSubmit();
+        if (!ok) return;
+      }
+
+      // send as application/x-www-form-urlencoded so PHP gets $_POST
+      $http({
+        method: "POST",
+        url: "../Backend/register.php",
+        data: $httpParamSerializerJQLike($scope.register),
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }).then(
+        function (response) {
+          // if PHP returns JSON, use it; if HTML, still treat success
+          var data = response.data;
+          if (data && data.success === false) {
+            $scope.errorMsg = data.message || "Registration failed.";
+          } else {
+            $scope.successMsg =
+              (data && data.message) ||
+              "Registration successful. Redirecting to login...";
+            setTimeout(function () {
+              $location.path("/login");
+              $scope.$apply();
+            }, 800);
+          }
+        },
+        function () {
+          $scope.errorMsg = "Server error during registration.";
+        }
+      );
+    };
+  }
+);
+
+// =============== LOGOUT CONTROLLER ===============
+app.controller("logoutCtrl", function ($scope, $http, $location) {
+  $http.get("../Backend/logout.php").finally(function () {
+    $location.path("/login");
+  });
+});
+
+// =============== HEADER + NAVBAR CONTROLLER ===============
+app.controller("headerCtrl", function ($scope, $rootScope, $http, $location) {
+  // DO NOT copy values to $scope – we want to use $rootScope directly
+
+  function applyProfile(profile) {
+    $rootScope.isLoggedIn = true;
+    $rootScope.currentUserName = (
+      (profile.fname || "") +
+      " " +
+      (profile.lname || "")
+    ).trim();
+  }
+
+  function checkLogin() {
+    $http.get("../Backend/get_profile.php").then(function (res) {
+      if (res.data === "NOT_LOGGED_IN") {
+        $rootScope.isLoggedIn = false;
+        $rootScope.currentUserName = "";
+      } else {
+        applyProfile(res.data);
+      }
+    });
+  }
+
+  // run once on app load
+  checkLogin();
+
+  // LOGOUT from navbar
+  $scope.logout = function () {
+    $http.get("../Backend/logout.php").finally(function () {
+      $rootScope.isLoggedIn = false;
+      $rootScope.currentUserName = "";
+      $location.path("/login");
+    });
+  };
+
+  // -------- AUTO LOGIN by clicking photos --------
+  const AUTO_LOGIN_PRESETS = {
+    Dhruvil: {
+      enrollment_no: "25GMCA36",
+      email: "dhruvil@example.com",
+      password: "password1",
+    },
+    Dhrumil: {
+      enrollment_no: "25GMCA34",
+      email: "dhrumil@example.com",
+      password: "password2",
+    },
+    Chirag: {
+      enrollment_no: "255690694051",
+      email: "chirag@gmail.com",
+      password: "Chirag@12",
+    },
+  };
+
+  $scope.autoLogin = function (who) {
+    const cred = AUTO_LOGIN_PRESETS[who];
+    if (!cred) {
+      alert("Auto login user not configured: " + who);
+      return;
     }
 
-    // send as application/x-www-form-urlencoded so PHP gets $_POST
-    $http({
-      method: "POST",
-      url: "../Backend/register.php",
-      data: $httpParamSerializerJQLike($scope.register),
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    }).then(
+    $http.post("../Backend/login.php", cred).then(
       function (response) {
-        // if PHP returns JSON, use it; if HTML, still treat success
-        var data = response.data;
-        if (data && data.success === false) {
-          $scope.errorMsg = data.message || "Registration failed.";
-        } else {
-          $scope.successMsg =
-            (data && data.message) ||
-            "Registration successful. Redirecting to login...";
-          setTimeout(function () {
-            $location.path("/login");
-            $scope.$apply();
-          }, 800);
+        const data = response.data;
+        if (!data || data.success === false) {
+          alert((data && data.message) || "Auto login failed.");
+          return;
         }
+
+        // after login, re-sync with PHP
+        checkLogin();
+        $location.path("/profile");
       },
       function () {
-        $scope.errorMsg = "Server error during registration.";
+        alert("Server error during auto login.");
       }
     );
   };
 });
-
-
-// =============== LOGOUT CONTROLLER ===============
-app.controller("logoutCtrl", function ($scope, $http) {
-  // just hit logout.php to clear session
-  $http.get("../Backend/logout.php").finally(function () {
-    // then go to login route
-    window.location.href = "Index.html#!/login";
-  });
-});
-
-app.controller("headerCtrl", function ($scope, $http, $location) {
-  $scope.isLoggedIn = false;
-
-  function checkLogin() {
-    $http.get("../Backend/get_profile.php").then(function (res) {
-      // your get_profile.php returns "NOT_LOGGED_IN" when no session
-      $scope.isLoggedIn = res.data !== "NOT_LOGGED_IN";
-    });
-  }
-
-  // run once when header loads
-  checkLogin();
-
-  $scope.logout = function () {
-    $http.get("../Backend/logout.php").then(function () {
-      $scope.isLoggedIn = false;
-      $location.path("/login");
-    });
-  };
-});
-
-
-// app.run(function ($rootScope, $http, $location) {
-//   $rootScope.$on("$routeChangeStart", function (event, next) {
-//     if (!next || !next.originalPath) return;
-
-//     $http.get("../Backend/get_profile.php").then(function (res) {
-//       const loggedIn = res.data !== "NOT_LOGGED_IN";
-
-//       const forGuestsOnly = ["/login", "/register"];
-//       const forLoggedOnly = ["/profile", "/studentform"];
-
-//       // Logged in trying to go to Login/Register → send to Profile
-//       if (loggedIn && forGuestsOnly.includes(next.originalPath)) {
-//         event.preventDefault();
-//         $location.path("/profile");
-//       }
-
-//       // Guest trying to go Profile/StudentForm → send to Login
-//       if (!loggedIn && forLoggedOnly.includes(next.originalPath)) {
-//         event.preventDefault();
-//         $location.path("/login");
-//       }
-//     });
-//   });
-// });
