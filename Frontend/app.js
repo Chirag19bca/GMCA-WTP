@@ -27,11 +27,11 @@ app.config(function ($routeProvider) {
       controller: "studentFormCtrl",
     })
     .when("/register", {
-      templateUrl: "./pages/Register.html",
+      templateUrl: "./pages/Register.html?v=2",
       controller: "registerCtrl",
     })
     .when("/login", {
-      templateUrl: "./pages/Login.html?v=2",
+      templateUrl: "./pages/Login.html?v=3",
       controller: "loginCtrl",
     })
     .when("/profile", {

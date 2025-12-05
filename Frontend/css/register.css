@@ -93,3 +93,15 @@
     font-size: 0.9em;
   }
 
+.password-wrapper {
+  position: relative;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 10px;
+  top: 7px;
+  cursor: pointer;
+  font-size: 18px;
+  user-select: none;
+}

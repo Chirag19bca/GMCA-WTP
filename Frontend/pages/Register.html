@@ -53,16 +53,25 @@
         <span class="error-msg" id="email_error"></span>
       </div>
 
-      <div class="form-row">
+      <div class="form-row password-row">
         <label>Password</label>
-        <input
-          type="password"
-          id="password"
-          name="password"
-          autocomplete="new-password"
-          class="form-control"
-          ng-model="register.password"
-        />
+        <div class="password-wrapper">
+          <input
+            ng-attr-type="{{ showRegPassword ? 'text' : 'password' }}"
+            id="password"
+            name="password"
+            autocomplete="new-password"
+            class="form-control"
+            ng-model="register.password"
+          />
+          <span
+            class="toggle-password"
+            ng-click="showRegPassword = !showRegPassword"
+            title="{{ showRegPassword ? 'Hide password' : 'Show password' }}"
+          >
+            {{ showRegPassword ? '👁' : '👁' }}
+          </span>
+        </div>
         <span class="error-msg" id="password_error"></span>
       </div>
 
@@ -83,3 +92,9 @@
 
 <!-- keep validation logic -->
 <script src="../js/register.js"></script>
+<script>
+  function toggleRegisterPassword() {
+    const field = document.getElementById("password");
+    field.type = field.type === "password" ? "text" : "password";
+  }
+</script>
