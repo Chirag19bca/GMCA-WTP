@@ -1,0 +1,55 @@
+.about-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 40px 15px;
+}
+
+.about-card {
+  width: 80%;
+  max-width: 800px;
+  background: #fff;
+  padding: 30px 40px;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.15);
+  font-family: Arial;
+}
+
+.about-card h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 32px;
+}
+
+.about-card h2 {
+  margin-top: 25px;
+  margin-bottom: 10px;
+  font-size: 22px;
+  color: #333;
+}
+
+.about-card p {
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+.about-card ul {
+  padding-left: 20px;
+  margin-bottom: 20px;
+}
+
+.about-card ul li {
+  margin-bottom: 5px;
+}
+
+.about-footer {
+  text-align: center;
+  margin-top: 25px;
+}
+
+.about-footer a {
+  text-decoration: none;
+  padding: 10px 20px;
+  background: green;
+  color: white;
+  border-radius: 5px;
+}

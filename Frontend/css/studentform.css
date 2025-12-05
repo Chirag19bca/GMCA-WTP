@@ -1,0 +1,165 @@
+  /* --- General Styles --- */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #EBE9EB;
+  /* light gray, matches sidebar in home page */
+  margin: 0;
+  padding: 20px;
+}
+
+/* --- Form Container --- */
+.form-container {
+  max-width: 700px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  padding: 25px 35px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  border-top: 8px solid orange;
+  border-bottom: 8px solid orange;
+  /* top accent like header */
+}
+
+/* --- Form Title --- */
+#form-title {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 30px;
+  background-color: orange;
+  /* matches header */
+  color: white;
+  padding: 12px;
+  border-radius: 5px;
+}
+
+/* --- Fieldset & Legend --- */
+fieldset {
+  border: none;
+  padding: 0;
+  margin: 0 0 30px 0;
+}
+
+legend {
+  width: 100%;
+  font-size: 1.2em;
+  font-weight: bold;
+  background-color: green;
+  /* footer color */
+  color: white;
+  padding: 12px 20px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+}
+
+/* --- Form Row & Input Styles --- */
+.form-row {
+  margin-bottom: 18px;
+}
+
+.form-row label,
+.form-label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: bold;
+  color: #333;
+  font-size: 18px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: orange;
+  /* focus color matches theme */
+  box-shadow: 0 0 5px rgba(255, 165, 0, 0.5);
+}
+
+/* --- Hover Animation (optional) --- */
+.hover-active {
+  border-color: orange;
+  box-shadow: 0 0 5px rgba(255, 165, 0, 0.5);
+  background-color: #fff8ef;
+  transform: scale(1.02);
+}
+
+/* --- Radio Button Group --- */
+.radio-group label {
+  font-weight: normal;
+  display: contents;
+  margin-right: 20px;
+}
+
+/* --- Submit & Home Button --- */
+.submit-container {
+  text-align: center;
+  margin-top: 30px;
+}
+
+#submit-btn {
+  background-color: green;
+  /* same as footer */
+  color: white;
+  padding: 15px 35px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+.nextbtn {
+  background-color: orange;
+  /* same as footer */
+  color: white;
+  padding: 15px 35px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+.backbtn {
+  background-color: black;
+  /* same as footer */
+  color: white;
+  padding: 15px 35px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+#submit-btn:hover {
+  background-color: #056e05;
+}
+
+#HomeLink {
+  display: inline-block;
+  margin-right: 20px;
+  padding: 15px 15px;
+  background-color: orange;
+  /* matches header */
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+}
+
+#HomeLink:hover {
+  background-color: darkorange;
+}
+
+/* --- Error Message --- */
+.error-msg {
+  color: red;
+  font-size: 15px;
+  margin-top: 3px;
+  display: block;
+}
+

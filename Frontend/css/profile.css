@@ -1,0 +1,107 @@
+/* PROFILE PAGE STYLING */
+
+.profile-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 30px 10px;
+}
+
+.profile-card {
+  width: 460px;
+  background: #ffffff;
+  padding: 20px 24px;
+  border-radius: 6px;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.15);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.profile-card h2 {
+  text-align: center;
+  margin: 0 0 15px;
+}
+
+.profile-status {
+  text-align: center;
+  margin: 8px 0;
+}
+
+.profile-status.error {
+  color: red;
+}
+
+.profile-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+
+.profile-table th,
+.profile-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+.profile-table th {
+  width: 40%;
+  background: #f5f5f5;
+}
+
+.profile-actions {
+  text-align: center;
+  margin-top: 15px;
+}
+
+.profile-actions .btn-danger {
+  background: #d9534f;
+  color: #fff;
+  border: none;
+  padding: 7px 16px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-weight: bold;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.profile-actions .btn-danger:hover {
+  background: #c9302c;
+}
+
+.auth-links {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.auth-links a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.auth-links a:hover {
+  text-decoration: underline;
+}
+
+.education-section h3 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+.education-section .profile-table th[colspan="2"] {
+  text-align: left;
+  background: #f0f0f0;
+}
+
+.btn-edit{
+  background-color: orange;
+  color: white;
+  border: none;
+  padding: 7px 16px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-weight: bold;
+  text-decoration: none;
+  margin-right: 10px;
+}

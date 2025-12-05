@@ -1,0 +1,131 @@
+body {
+  margin: 0;
+  padding: 0;
+  height: 15vh;                 /* full viewport */
+}
+
+/* MAIN TABLE */
+.main-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+}
+
+/* HEADER */
+.header {
+  background-color: orange;
+  color: white;
+}
+
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px;
+}
+
+.student-img {
+  width: 80px;
+  height: 100px;
+  margin-right: 10px;
+  border-radius: 3px;
+  border: black 2px solid;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.header-content {
+  text-align: center;
+  flex-grow: 1;
+}
+
+.header-content h1 {
+  font-size: 40px;
+  margin: 0;
+}
+
+.header-content h3 {
+  margin-top: 5px;
+}
+
+.header-right .logo {
+  width: 100px;
+  height: 100px;
+}
+
+/* NAVIGATION */
+.navbar {
+  background-color: #bebebe;
+  text-align: center;
+  padding: 10px;
+  height: 24px;
+}
+
+.navbar a {
+  text-decoration: none;
+  color: rgb(14, 14, 216);
+  font-weight: bold;
+  padding: 0 8px;
+}
+
+.navbar a:hover {
+  text-decoration: underline;
+}
+
+/* CONTENT AREA */
+.content-row {
+  vertical-align: top;
+}
+
+.sidebar {
+  width: 20%;
+  background-color: #ebe9eb;
+  padding: 15px;
+}
+
+.content {
+  width: 60%;
+  padding: 3px;
+  padding-left: 15px;
+}
+
+/* FORM */
+form input[type="text"],
+form input[type="email"],
+form textarea {
+  width: 95%;
+  padding: 8px;
+  border: 1px solid #999;
+}
+
+form input[type="submit"] {
+  padding: 8px 15px;
+  background-color: green;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+form input[type="submit"]:hover {
+  background-color: darkgreen;
+}
+
+/* FOOTER */
+.footer {
+  background-color: green;
+  color: white;
+  text-align: center;
+  padding: 10px;
+}
+
+
+/* FIXED NG-VIEW AREA */
+.view-container {
+  min-height: 546px;   /* FIXED HEIGHT */
+  max-height: 546px;
+  overflow-y: auto;     /* Scroll if content is long */
+  background-color: #fff;
+}

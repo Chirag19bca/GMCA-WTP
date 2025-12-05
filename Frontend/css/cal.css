@@ -1,0 +1,100 @@
+/* --- General Page Style --- */
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  margin-top: 50px;
+  background-color: #ebe9eb;
+  /* light gray to match home sidebar */
+}
+
+h2 {
+  background-color: orange;
+  /* header color */
+  color: white;
+  display: inline-block;
+  padding: 10px 25px;
+  border-radius: 8px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* --- Calculator Box --- */
+.calculator {
+  display: inline-block;
+  border: 2px solid green;
+  /* border in footer theme color */
+  padding: 20px;
+  border-radius: 10px;
+  background-color: orange;
+  /* white panel like content area */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Display Input --- */
+input {
+  width: 170px;
+  height: 35px;
+  font-size: 18px;
+  text-align: right;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding-right: 5px;
+}
+
+/* --- Buttons --- */
+button {
+  width: 40px;
+  height: 40px;
+  margin: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  background-color: white;
+  /* orange for default buttons */
+  color: black;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  background-color: lightgray;
+  transform: scale(1.05);
+}
+
+/* --- Special Buttons --- */
+button[onclick="clearDisplay()"] {
+  background-color: red;
+  /* red for clear */
+}
+
+button[onclick="clearDisplay()"]:hover {
+  background-color: #b02a37;
+}
+
+button[onclick="calculate()"] {
+  background-color: green;
+  /* green for equal */
+}
+
+button[onclick="calculate()"]:hover {
+  background-color: #056e05;
+}
+
+/* --- Home Link --- */
+#HomeLink {
+  display: inline-block;
+  margin-top: 25px;
+  padding: 10px 15px;
+  background-color: green;
+  /* footer color */
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+#HomeLink:hover {
+  background-color: #056e05;
+}

@@ -1,0 +1,123 @@
+<link rel="stylesheet" href="./css/studentform.css?v=3" />
+
+<main class="form-container" ng-controller="studentFormCtrl">
+  <img src="./Asset/GMCAwithName.png" width="650pt" />
+  <h1 id="form-title">Student Application Form</h1>
+
+  <form id="student-form" ng-submit="submitForm()">
+    <!-- STEP 1: Basic + Personal Info -->
+    <fieldset ng-show="step === 1">
+      <legend>Personal Information</legend>
+
+      <!-- readonly autofill -->
+      <div class="form-row">
+        <label>Enrollment No</label>
+        <input type="text" class="form-control" ng-model="form.enrollment_no" readonly />
+      </div>
+
+      <div class="form-row">
+        <label>First Name</label>
+        <input type="text" class="form-control" ng-model="form.first_name" readonly />
+      </div>
+
+      <div class="form-row">
+        <label>Last Name</label>
+        <input type="text" class="form-control" ng-model="form.last_name" readonly />
+      </div>
+
+      <div class="form-row">
+        <label>Email</label>
+        <input type="text" class="form-control" ng-model="form.email" readonly />
+      </div>
+
+      <!-- editable fields -->
+      <div class="form-row">
+        <label>Date of Birth</label>
+        <input type="date" id="dob" ng-model="form.dob" class="form-control" />
+        <span id="dob_error" class="error-msg"></span>
+      </div>
+
+      <div class="form-row">
+        <label>Gender</label>
+        <div class="radio-group">
+          <label><input type="radio" name="gender" value="male" ng-model="form.gender" /> Male</label>
+          <label><input type="radio" name="gender" value="female" ng-model="form.gender" /> Female</label>
+        </div>
+        <span id="gender_error" class="error-msg"></span>
+      </div>
+
+      <div class="form-row">
+        <label>Contact No</label>
+        <input type="text" id="contact_no" ng-model="form.contact_no" class="form-control" />
+        <span id="contact_no_error" class="error-msg"></span>
+      </div>
+
+      <div class="form-row">
+        <label>Address</label>
+        <textarea id="address" ng-model="form.address" class="form-control"></textarea>
+        <span id="address_error" class="error-msg"></span>
+      </div>
+
+      <div class="submit-container">
+        <button type="button" id="next-btn" ng-click="goStep(2)" class="nextbtn">Next &raquo;</button>
+      </div>
+    </fieldset>
+
+    <!-- STEP 2: Education -->
+    <fieldset ng-show="step === 2">
+      <legend>Education Details</legend>
+
+      <h3>10th Standard</h3>
+      <div class="form-row">
+        <label>School Name</label>
+        <input type="text" id="ssc_school" ng-model="form.ssc_school" class="form-control" />
+        <span id="ssc_school_error" class="error-msg"></span>
+      </div>
+      <div class="form-row">
+        <label>Board</label>
+        <select id="ssc_board" class="form-control" ng-model="form.ssc_board">
+          <option value="" disabled>Select</option>
+          <option value="GSEB">GSEB</option>
+          <option value="CBSE">CBSE</option>
+          <option value="ICSE">ICSE</option>
+        </select>
+        <span id="ssc_board_error" class="error-msg"></span>
+      </div>
+      <div class="form-row">
+        <label>Percentage</label>
+        <input type="number" id="ssc_percentage" ng-model="form.ssc_percentage" class="form-control" />
+        <span id="ssc_percentage_error" class="error-msg"></span>
+      </div>
+
+      <h3>12th Standard</h3>
+      <div class="form-row">
+        <label>School Name</label>
+        <input type="text" id="hsc_school" ng-model="form.hsc_school" class="form-control" />
+                <span id="hsc_school_error" class="error-msg"></span>
+
+      </div>
+      <div class="form-row">
+        <label>Board</label>
+        <select id="hsc_board" class="form-control" ng-model="form.hsc_board">
+          <option value="" disabled>Select</option>
+          <option value="GSEB">GSEB</option>
+          <option value="CBSE">CBSE</option>
+          <option value="ICSE">ICSE</option>
+        </select>
+        <span id="hsc_board_error" class="error-msg"></span>
+      </div>
+      <div class="form-row">
+        <label>Percentage</label>
+        <input type="number" id="hsc_percentage" ng-model="form.hsc_percentage" class="form-control" />
+        <span id="hsc_percentage_error" class="error-msg"></span>
+      </div>
+
+      <div class="submit-container">
+        <button type="button" id="back-btn" ng-click="goStep(1)" class="backbtn">&laquo; Back</button>
+        <button type="submit" id="submit-btn">Submit Application</button>
+      </div>
+    </fieldset>
+  </form>
+</main>
+
+<script src="../js/studentform.js"></script>
