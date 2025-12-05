@@ -1,12 +1,4 @@
 /* --- General Page Style --- */
-body {
-  font-family: Arial, sans-serif;
-  text-align: center;
-  margin-top: 50px;
-  background-color: #ebe9eb;
-  /* light gray to match home sidebar */
-}
-
 h2 {
   background-color: orange;
   /* header color */
@@ -81,20 +73,13 @@ button[onclick="calculate()"]:hover {
   background-color: #056e05;
 }
 
-/* --- Home Link --- */
-#HomeLink {
-  display: inline-block;
-  margin-top: 25px;
-  padding: 10px 15px;
-  background-color: green;
-  /* footer color */
-  color: white;
-  text-decoration: none;
-  border-radius: 5px;
-  font-weight: bold;
-  transition: 0.2s;
+.calc-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
 }
 
-#HomeLink:hover {
-  background-color: #056e05;
+.calc-container {
+  text-align: center; /* centers h2 */
 }

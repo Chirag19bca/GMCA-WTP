@@ -20,6 +20,7 @@ app.config(function ($routeProvider) {
     })
     .when("/calc", {
       templateUrl: "./pages/Calc.html",
+      controller: "calcCtrl",
     })
     .when("/studentform", {
       templateUrl: "./pages/studentform.html?v=2",
@@ -66,6 +67,37 @@ app.controller("profileCtrl", function ($scope, $http, $location) {
     }
   );
 });
+// =============== CALCULATOR CONTROLLER ===============
+app.controller("calcCtrl", function ($scope, $rootScope, $http, $location) {
+  // If Angular already knows user is logged in, do nothing
+  if ($rootScope.isLoggedIn) {
+    return;
+  }
+
+  // On hard refresh, Angular doesn't know yet -> ask PHP session
+  $http.get("../Backend/get_profile.php").then(
+    function (res) {
+      if (res.data === "NOT_LOGGED_IN") {
+        // User really not logged in -> just redirect quietly (no alert)
+        $location.path("/login");
+      } else {
+        // Session is valid -> restore Angular state from profile
+        $rootScope.isLoggedIn = true;
+        $rootScope.currentUserName = (
+          (res.data.fname || "") +
+          " " +
+          (res.data.lname || "")
+        ).trim();
+        // stay on /calc, calculator will work normally
+      }
+    },
+    function () {
+      // if server error, also send user to login (fallback)
+      $location.path("/login");
+    }
+  );
+});
+
 
 // =============== STUDENT FORM CONTROLLER ===============
 app.controller("studentFormCtrl", function ($scope, $http, $location) {
@@ -115,34 +147,90 @@ app.controller("studentFormCtrl", function ($scope, $http, $location) {
 app.controller("loginCtrl", function ($scope, $http, $location, $rootScope) {
   $scope.loginData = {};
   $scope.errorMsg = "";
+  $scope.successMsg = "";
 
+  // ---------- ROUTE GUARD ----------
+  // If Angular already knows user is logged in → go to profile
+  if ($rootScope.isLoggedIn) {
+    $location.path("/profile");
+    return;
+  }
+
+  // On hard refresh, Angular may not know yet → ask PHP
+  $http.get("../Backend/get_profile.php").then(function (res) {
+    if (res.data !== "NOT_LOGGED_IN") {
+      // Session is valid → restore state and redirect
+      $rootScope.isLoggedIn = true;
+      $rootScope.currentUserName = (
+        (res.data.fname || "") +
+        " " +
+        (res.data.lname || "")
+      ).trim();
+      $location.path("/profile");
+    }
+  });
+
+  // ---------- NORMAL LOGIN LOGIC ----------
   $scope.doLogin = function () {
     $scope.errorMsg = "";
+    $scope.successMsg = "";
 
     $http.post("../Backend/login.php", $scope.loginData).then(
       function (response) {
         var data = response.data;
 
-        // adjust this condition to match your real response
-        if (data === "Login successful" || data.success) {
-          // re-sync from PHP so header shows correct name
-          $http.get("../Backend/get_profile.php").then(function (res2) {
-            if (res2.data !== "NOT_LOGGED_IN") {
-              $rootScope.isLoggedIn = true;
-              $rootScope.currentUserName = (
-                (res2.data.fname || "") +
-                " " +
-                (res2.data.lname || "")
-              ).trim();
-            }
-            $location.path("/profile");
-          });
+        // CASE 1: JSON response {success, message}
+        if (data && typeof data === "object") {
+          if (data.success) {
+            $scope.successMsg = data.message || "Login successful.";
+
+            $http.get("../Backend/get_profile.php").then(function (res2) {
+              if (res2.data !== "NOT_LOGGED_IN") {
+                $rootScope.isLoggedIn = true;
+                $rootScope.currentUserName = (
+                  (res2.data.fname || "") +
+                  " " +
+                  (res2.data.lname || "")
+                ).trim();
+              }
+              $location.path("/profile");
+            });
+          } else {
+            $scope.errorMsg =
+              data.message ||
+              "Invalid Enrollment No / Email / Password.";
+          }
+        }
+
+        // CASE 2: plain string response
+        else if (typeof data === "string") {
+          var msg = data.trim();
+
+          if (msg.toLowerCase().indexOf("login successful") !== -1) {
+            $scope.successMsg = msg;
+
+            $http.get("../Backend/get_profile.php").then(function (res2) {
+              if (res2.data !== "NOT_LOGGED_IN") {
+                $rootScope.isLoggedIn = true;
+                $rootScope.currentUserName = (
+                  (res2.data.fname || "") +
+                  " " +
+                  (res2.data.lname || "")
+                ).trim();
+              }
+              $location.path("/profile");
+            });
+          } else {
+            // here you still get your detailed messages:
+            // "Enrollment no and email do not match", "Enrollment no not found", etc.
+            $scope.errorMsg = msg || "Login failed.";
+          }
         } else {
-          alert("Invalid credentials");
+          $scope.errorMsg = "Unexpected response from server.";
         }
       },
       function () {
-        alert("Server error");
+        $scope.errorMsg = "Server error while logging in.";
       }
     );
   };
@@ -151,11 +239,39 @@ app.controller("loginCtrl", function ($scope, $http, $location, $rootScope) {
 // =============== REGISTER CONTROLLER ===============
 app.controller(
   "registerCtrl",
-  function ($scope, $http, $location, $httpParamSerializerJQLike) {
+  function (
+    $scope,
+    $http,
+    $location,
+    $httpParamSerializerJQLike,
+    $rootScope
+  ) {
     $scope.register = {};
     $scope.successMsg = "";
     $scope.errorMsg = "";
 
+    // ---------- ROUTE GUARD ----------
+    // 1) Angular already knows user is logged in
+    if ($rootScope.isLoggedIn) {
+      $location.path("/profile");
+      return;
+    }
+
+    // 2) On hard refresh, Angular may not know yet -> ask PHP session
+    $http.get("../Backend/get_profile.php").then(function (res) {
+      if (res.data !== "NOT_LOGGED_IN") {
+        // Session exists -> restore state and redirect to profile
+        $rootScope.isLoggedIn = true;
+        $rootScope.currentUserName = (
+          (res.data.fname || "") +
+          " " +
+          (res.data.lname || "")
+        ).trim();
+        $location.path("/profile");
+      }
+    });
+
+    // ---------- NORMAL REGISTER LOGIC ----------
     $scope.doRegister = function () {
       $scope.successMsg = "";
       $scope.errorMsg = "";
