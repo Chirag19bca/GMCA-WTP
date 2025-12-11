@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 05, 2025 at 03:58 PM
+-- Generation Time: Dec 11, 2025 at 09:45 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -69,9 +69,11 @@ CREATE TABLE `student_profile` (
 --
 
 INSERT INTO `student_profile` (`id`, `user_id`, `fname`, `lname`, `dob`, `gender`, `contact`, `address`, `email`) VALUES
-(3, 6, 'Dhruvil', 'Lodha', NULL, NULL, NULL, NULL, 'dhruvil@gmail.com'),
 (4, 7, 'Chirag', 'Sadhu', '2004-08-04', 'male', '9537412455', 'Khodiyar nagar na chhapra,chhaganbhai na chhapra,behrampura, ahmadabad city, Ahmedabad', 'chirag@gmail.com'),
-(5, 8, 'Heet', 'Shah', '2004-08-04', 'male', '9587874124', 'dfadsfasedf', 'heet@gmail.com');
+(5, 8, 'Heet', 'Shah', '2004-08-04', 'male', '9587874124', 'dfadsfasedf', 'heet@gmail.com'),
+(6, 9, 'Dhruvil', 'Lodha', NULL, NULL, NULL, NULL, 'dhruvil@gmail.com'),
+(7, 10, 'Dhrumil', 'Jadav', NULL, NULL, NULL, NULL, 'dhrumil@gmail.com'),
+(8, 11, 'Aryan', 'Mehtani', NULL, NULL, NULL, NULL, 'aryan@gmail.com');
 
 -- --------------------------------------------------------
 
@@ -91,9 +93,11 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `enrollment_no`, `email`, `password`) VALUES
-(6, '255690694021', 'dhruvil@gmail.com', '$2y$10$e9VLO2dspnRBMv.GTDphkOT626Nlf4d67xA0BRn3OWMoG.C1fhsZm'),
 (7, '255690694051', 'chirag@gmail.com', '$2y$10$DTVt6UbY7A6VspjWyYtU4e4hIX.AEDenu5vlhqIFikvnDqhnlu3E6'),
-(8, '255690694005', 'heet@gmail.com', '$2y$10$oL6m1URaTHjG56NWhjnpX.iPsFQn5KHddU5PIdm5CkkBspKABjR0S');
+(8, '255690694005', 'heet@gmail.com', '$2y$10$oL6m1URaTHjG56NWhjnpX.iPsFQn5KHddU5PIdm5CkkBspKABjR0S'),
+(9, '255690694021', 'dhruvil@gmail.com', '$2y$10$glSnUH6X3a0PYlwjP0Un1uLmYxIUiHiAuHmhWFbp/i7oa9q2XKmWK'),
+(10, '255690694015', 'dhrumil@gmail.com', '$2y$10$GX0EYa/XGN7cZmTpQRpP9OCP/f1QTRm2ZBX1mYTQSOIwIofhZMu5.'),
+(11, '255690694028', 'aryan@gmail.com', '$2y$10$drhLVxMW2R/y5j8o0X5pTuWOYXf5mxRJwbCtRjGXJ.T1MRZV4Itbq');
 
 --
 -- Indexes for dumped tables
@@ -135,13 +139,13 @@ ALTER TABLE `education_details`
 -- AUTO_INCREMENT for table `student_profile`
 --
 ALTER TABLE `student_profile`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- Constraints for dumped tables

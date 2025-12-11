@@ -300,10 +300,10 @@ app.controller(
             $scope.successMsg =
               (data && data.message) ||
               "Registration successful. Redirecting to login...";
-            setTimeout(function () {
+            $http.get("../backend/logout.php").finally(function () {
               $location.path("/login");
-              $scope.$apply();
-            }, 800);
+              if(!$scope.$$phase) $scope.$apply();
+            });
           }
         },
         function () {
@@ -323,7 +323,8 @@ app.controller("logoutCtrl", function ($scope, $http, $location) {
 
 // =============== HEADER + NAVBAR CONTROLLER ===============
 app.controller("headerCtrl", function ($scope, $rootScope, $http, $location) {
-  // DO NOT copy values to $scope – we want to use $rootScope directly
+  // guard so we don't run checkLogin many times
+  if (!$rootScope._authInit) $rootScope._authInit = {checking:false, done:false};
 
   function applyProfile(profile) {
     $rootScope.isLoggedIn = true;
@@ -335,6 +336,10 @@ app.controller("headerCtrl", function ($scope, $rootScope, $http, $location) {
   }
 
   function checkLogin() {
+    // if already checking or already done recently, skip
+    if ($rootScope._authInit.checking) return;
+    $rootScope._authInit.checking = true;
+
     $http.get("../Backend/get_profile.php").then(function (res) {
       if (res.data === "NOT_LOGGED_IN") {
         $rootScope.isLoggedIn = false;
@@ -342,17 +347,22 @@ app.controller("headerCtrl", function ($scope, $rootScope, $http, $location) {
       } else {
         applyProfile(res.data);
       }
+    }).finally(function () {
+      $rootScope._authInit.checking = false;
+      $rootScope._authInit.done = true;
     });
   }
 
-  // run once on app load
+  // run once on header init
   checkLogin();
 
-  // LOGOUT from navbar
-  $scope.logout = function () {
+  // LOGOUT from navbar (prevent default event)
+  $scope.logout = function ($event) {
+    if ($event && $event.preventDefault) $event.preventDefault();
     $http.get("../Backend/logout.php").finally(function () {
       $rootScope.isLoggedIn = false;
       $rootScope.currentUserName = "";
+      // prefer $location.path rather than window.location to keep it SPA
       $location.path("/login");
     });
   };
@@ -360,9 +370,9 @@ app.controller("headerCtrl", function ($scope, $rootScope, $http, $location) {
   // -------- AUTO LOGIN by clicking photos --------
   const AUTO_LOGIN_PRESETS = {
     Dhruvil: {
-      enrollment_no: "25GMCA36",
-      email: "dhruvil@example.com",
-      password: "password1",
+      enrollment_no: "255690694021",
+      email: "dhruvil@gmail.com",
+      password: "Dhruvil@25",
     },
     Dhrumil: {
       enrollment_no: "25GMCA34",
@@ -390,8 +400,7 @@ app.controller("headerCtrl", function ($scope, $rootScope, $http, $location) {
           alert((data && data.message) || "Auto login failed.");
           return;
         }
-
-        // after login, re-sync with PHP
+        // re-sync with PHP session
         checkLogin();
         $location.path("/profile");
       },

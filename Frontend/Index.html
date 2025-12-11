@@ -25,10 +25,10 @@
     <link rel="stylesheet" href="./css/studentform.css?v=3" />
   </head>
 
-    <body ng-controller="headerCtrl">
+    <body>
     <table class="main-table">
       <!-- Header Section -->
-      <tr class="header">
+      <tr class="header"  ng-controller="headerCtrl">
         <td colspan="3">
           <div class="header-container">
             <div class="header-left">
@@ -76,7 +76,7 @@
 
       <!-- Navigation Bar -->
       <!-- NOTE: controller is now on <body>, so remove here -->
-      <tr class="navbar">
+      <tr class="navbar" ng-controller="headerCtrl">
         <td colspan="3">
           <a href="#!/home">Home</a> | <a href="#!/about">About Us</a> |
           <a href="#!/services">Services</a> |
