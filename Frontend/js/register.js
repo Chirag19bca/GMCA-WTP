@@ -37,7 +37,10 @@ function validateRegisterField(field) {
         showError("enrollment_no_error", "Only digits are allowed.");
         ok = false;
       } else if (value.length !== 12) {
-        showError("enrollment_no_error", "Enrollment number must be 12 digits.");
+        showError(
+          "enrollment_no_error",
+          "Enrollment number must be 12 digits."
+        );
         ok = false;
       } else clearError("enrollment_no_error");
       break;
@@ -73,8 +76,7 @@ function validateRegisterField(field) {
       } else clearError("email_error");
       break;
 
-    case "password":
-      // SAME rules for BOTH register + login
+    case "password": {
       const pass = value;
       const uppercase = /[A-Z]/;
       const digit = /[0-9]/;
@@ -86,17 +88,35 @@ function validateRegisterField(field) {
       } else if (!uppercase.test(pass)) {
         showError(
           "password_error",
-          "Password must contain at least 1 uppercase letter."
+          "Password must contain 1 uppercase letter."
         );
         ok = false;
       } else if (!digit.test(pass)) {
-        showError("password_error", "Password must contain at least 1 digit.");
+        showError("password_error", "Password must contain 1 digit.");
         ok = false;
       } else if (!special.test(pass)) {
         showError("password_error", "Use at least one of @ # $");
         ok = false;
-      } else clearError("password_error");
+      } else {
+        clearError("password_error");
+      }
       break;
+    }
+
+    case "confirm_password": {
+      const password = v("password");
+
+      if (!value) {
+        showError("confirm_password_error", "Confirm password is required.");
+        ok = false;
+      } else if (value !== password) {
+        showError("confirm_password_error", "Passwords do not match.");
+        ok = false;
+      } else {
+        clearError("confirm_password_error");
+      }
+      break;
+    }
   }
 
   return ok;
@@ -108,11 +128,17 @@ function validateRegisterField(field) {
 function getActiveAuthForm() {
   const regForm = document.getElementById("register-form");
   const logForm = document.getElementById("login-form");
+  const forgotForm = document.getElementById("forgot-form");
+  const resetForm = document.getElementById("reset-form");
 
   if (regForm) return regForm;
   if (logForm) return logForm;
+  if (forgotForm) return forgotForm;
+  if (resetForm) return resetForm;
+
   return null;
 }
+
 
 // ------------------------------
 // Live validation (blur + input)
@@ -121,15 +147,15 @@ function getActiveAuthForm() {
 document.addEventListener(
   "blur",
   function (e) {
-    const form = document.getElementById("register-form");
+    const form = getActiveAuthForm();
     if (!form) return;
+
     if (form.contains(e.target) && e.target.tagName === "INPUT") {
       validateRegisterField(e.target);
     }
   },
   true
 );
-
 
 document.addEventListener("input", function (e) {
   const form = getActiveAuthForm();

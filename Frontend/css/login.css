@@ -80,3 +80,26 @@
   font-size: 18px;
   user-select: none;
 }
+
+/* =========================
+   FORGOT / RESET PASSWORD
+   ========================= */
+
+.auth-card .success {
+  color: green;
+  font-size: 14px;
+  margin-top: 8px;
+  text-align: center;
+}
+
+.auth-card .error {
+  color: red;
+  font-size: 14px;
+  margin-top: 8px;
+  text-align: center;
+}
+
+/* link spacing for forgot/reset pages */
+.auth-links {
+  margin-top: 12px;
+}

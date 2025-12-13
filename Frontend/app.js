@@ -38,6 +38,14 @@ app.config(function ($routeProvider) {
       templateUrl: "./pages/Profile.html?v=3",
       controller: "profileCtrl",
     }) // v=3 to avoid cache
+    .when("/forgot-password", {
+      templateUrl: "./pages/ForgotPassword.html",
+      controller: "forgotPasswordCtrl",
+    })
+    .when("/reset-password", {
+      templateUrl: "./pages/ResetPassword.html",
+      controller: "resetPasswordCtrl",
+    })
     .otherwise({ redirectTo: "/home" });
 });
 
@@ -448,6 +456,98 @@ app.controller("headerCtrl", function ($scope, $rootScope, $http, $location) {
       },
       function () {
         alert("Server error during auto login.");
+      }
+    );
+  };
+});
+// =============== FORGOT PASSWORD CONTROLLER ===============
+app.controller("forgotPasswordCtrl", function ($scope, $http, $location) {
+  $scope.data = {};
+  $scope.error = "";
+  $scope.success = "";
+  $scope.loading = false;
+
+  $scope.sendReset = function () {
+    $scope.error = "";
+    $scope.success = "";
+
+    // validate ONLY required fields
+    const enrollField = document.getElementById("enrollment_no");
+    const emailField = document.getElementById("email");
+
+    let valid = true;
+
+    if (!validateRegisterField(enrollField)) valid = false;
+    if (!validateRegisterField(emailField)) valid = false;
+
+    if (!valid) return; // stop if invalid
+
+    $scope.loading = true;
+
+    $http.post("../Backend/forgot_password.php", $scope.data).then(
+      function (res) {
+        $scope.loading = false;
+
+        if (res.data && res.data.success === true) {
+          $scope.success =
+            "Verification successful. Please reset your password.";
+
+          setTimeout(function () {
+            $scope.$apply(function () {
+              $location.path("/reset-password");
+            });
+          }, 500);
+        } else {
+          $scope.error =
+            (res.data && res.data.message) ||
+            "Invalid enrollment number or email.";
+        }
+      },
+      function () {
+        $scope.loading = false;
+        $scope.error = "Server error. Please try again later.";
+      }
+    );
+  };
+});
+
+// =============== RESET PASSWORD CONTROLLER ===============
+app.controller("resetPasswordCtrl", function ($scope, $http, $location) {
+  $scope.data = {};
+  $scope.error = "";
+  $scope.success = "";
+  $scope.showPassword = false;
+
+  $scope.resetPassword = function () {
+    $scope.error = "";
+
+    // validate password strength
+    if (!validateRegisterField(document.getElementById("password"))) return;
+
+    // validate confirm password
+    if (!validateRegisterField(document.getElementById("confirm_password")))
+      return;
+
+    if ($scope.data.password !== $scope.data.confirm) {
+      $scope.error = "Passwords do not match.";
+      return;
+    }
+
+    $http.post("../Backend/reset_password.php", $scope.data).then(
+      function (res) {
+        if (res.data.success) {
+          $scope.success = "Password reset successful.";
+          setTimeout(function () {
+            $scope.$apply(function () {
+              $location.path("/login");
+            });
+          }, 500);
+        } else {
+          $scope.error = res.data.message || "Reset failed.";
+        }
+      },
+      function () {
+        $scope.error = "Server error.";
       }
     );
   };
