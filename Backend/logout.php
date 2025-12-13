@@ -1,8 +1,11 @@
 <?php
+header("Content-Type: application/json");
 session_start();
-session_unset();
+
+// clear session safely
+$_SESSION = [];
 session_destroy();
 
-header("Location: ../Frontend/Index.html#!/login");
+// always respond success
+echo json_encode(["success" => true]);
 exit;
-?>

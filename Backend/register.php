@@ -5,7 +5,7 @@ header('Content-Type: application/json');
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-session_start();
+
 
 // adjust to your DB file
 require_once 'db.php';   // must define $conn (mysqli)

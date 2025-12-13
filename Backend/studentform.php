@@ -1,92 +1,125 @@
 <?php
-header('Content-Type: application/json');
+header("Content-Type: application/json");
 session_start();
-require_once 'db.php';
+require_once "db.php";
 
+/* ================= AUTH CHECK ================= */
 if (!isset($_SESSION['user_id'])) {
-    echo json_encode(["success" => false, "message" => "Not logged in"]);
+    echo json_encode([
+        "success" => false,
+        "message" => "SESSION_EXPIRED"
+    ]);
     exit;
 }
 
-$user_id = $_SESSION['user_id'];
+$user_id = $_SESSION['user_id']; // ALWAYS from session
 
-$data = json_decode(file_get_contents("php://input"), true);
-if (!$data) {
-    echo json_encode(["success" => false, "message" => "Invalid input"]);
+/* ================= READ JSON BODY ================= */
+$input = json_decode(file_get_contents("php://input"), true);
+
+if (!$input) {
+    echo json_encode([
+        "success" => false,
+        "message" => "INVALID_INPUT"
+    ]);
     exit;
 }
 
-// assign values to variables (required for bind_param)
-$dob            = $data['dob'] ?? "";
-$gender         = $data['gender'] ?? "";
-$contact_no     = $data['contact_no'] ?? "";
-$address        = $data['address'] ?? "";
+/* ================= PERSONAL DETAILS ================= */
+$dob     = $input['dob'] ?? null;
+$gender  = $input['gender'] ?? null;
+$contact = $input['contact_no'] ?? null;
+$address = $input['address'] ?? null;
 
-$ssc_school      = $data['ssc_school'] ?? "";
-$ssc_board       = $data['ssc_board'] ?? "";
-$ssc_percentage  = $data['ssc_percentage'] ?? null;
+/* Convert ISO date → MySQL date */
+if ($dob) {
+    $dob = date("Y-m-d", strtotime($dob));
+}
 
-$hsc_school      = $data['hsc_school'] ?? "";
-$hsc_board       = $data['hsc_board'] ?? "";
-$hsc_percentage  = $data['hsc_percentage'] ?? null;
+/* ================= EDUCATION DETAILS ================= */
+$ssc_school     = $input['ssc_school'] ?? null;
+$ssc_board      = $input['ssc_board'] ?? null;
+$ssc_percentage = $input['ssc_percentage'] ?? null;
 
-/* ------------------------------------------
-   1) Update student_profile
--------------------------------------------*/
-$profileSql = "UPDATE student_profile 
-               SET dob=?, gender=?, contact=?, address=? 
-               WHERE user_id=?";
-$pstmt = $conn->prepare($profileSql);
-$pstmt->bind_param("ssssi", $dob, $gender, $contact_no, $address, $user_id);
-$pstmt->execute();
-$pstmt->close();
+$hsc_school     = $input['hsc_school'] ?? null;
+$hsc_board      = $input['hsc_board'] ?? null;
+$hsc_percentage = $input['hsc_percentage'] ?? null;
 
-/* ------------------------------------------
-   2) Insert OR Update education_details
--------------------------------------------*/
-$checkEdu = $conn->prepare("SELECT id FROM education_details WHERE user_id=?");
-$checkEdu->bind_param("i", $user_id);
-$checkEdu->execute();
-$checkEdu->store_result();
+/* ================= UPDATE student_profile ================= */
+$profileSql = "
+    UPDATE student_profile SET
+        dob = ?,
+        gender = ?,
+        contact = ?,
+        address = ?
+    WHERE user_id = ?
+";
 
-if ($checkEdu->num_rows > 0) {
-    // update
-    $eduSql = "UPDATE education_details SET 
-    ssc_school=?, ssc_board=?, ssc_percentage=?, 
-    hsc_school=?, hsc_board=?, hsc_percentage=? 
-    WHERE user_id=?";
-$stmt = $conn->prepare($eduSql);
-$stmt->bind_param(
-    "ssdssdi",
-    $ssc_school,   // s
-    $ssc_board,    // s
-    $ssc_percentage, // d
-    $hsc_school,   // s
-    $hsc_board,    // s  
-    $hsc_percentage, // d
-    $user_id       // i
+$stmt = mysqli_prepare($conn, $profileSql);
+mysqli_stmt_bind_param(
+    $stmt,
+    "ssssi",
+    $dob,
+    $gender,
+    $contact,
+    $address,
+    $user_id
 );
+mysqli_stmt_execute($stmt);
 
+/* ================= CHECK education_details ================= */
+$checkSql = "SELECT id FROM education_details WHERE user_id = ?";
+$stmt = mysqli_prepare($conn, $checkSql);
+mysqli_stmt_bind_param($stmt, "i", $user_id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+
+$exists = mysqli_num_rows($result) > 0;
+
+/* ================= INSERT / UPDATE education_details ================= */
+if ($exists) {
+    $eduSql = "
+        UPDATE education_details SET
+            ssc_school = ?,
+            ssc_board = ?,
+            ssc_percentage = ?,
+            hsc_school = ?,
+            hsc_board = ?,
+            hsc_percentage = ?
+        WHERE user_id = ?
+    ";
 } else {
-    // insert
-    $eduSql = "INSERT INTO education_details 
-        (user_id, ssc_school, ssc_board, ssc_percentage, hsc_school, hsc_board, hsc_percentage)
-        VALUES (?, ?, ?, ?, ?, ?, ?)";
-    $stmt = $conn->prepare($eduSql);
-    $stmt->bind_param(
-    "issdssd",
-    $user_id,         // i
-    $ssc_school,      // s
-    $ssc_board,       // s
-    $ssc_percentage,  // d
-    $hsc_school,      // s
-    $hsc_board,       // s  
-    $hsc_percentage   // d
-);
-
+    $eduSql = "
+        INSERT INTO education_details
+            (ssc_school, ssc_board, ssc_percentage,
+             hsc_school, hsc_board, hsc_percentage, user_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    ";
 }
 
-$stmt->execute();
-$stmt->close();
+$stmt = mysqli_prepare($conn, $eduSql);
+mysqli_stmt_bind_param(
+    $stmt,
+    "ssssssi",
+    $ssc_school,
+    $ssc_board,
+    $ssc_percentage,
+    $hsc_school,
+    $hsc_board,
+    $hsc_percentage,
+    $user_id
+);
 
-echo json_encode(["success" => true, "message" => "Application submitted successfully"]);
+$ok = mysqli_stmt_execute($stmt);
+
+/* ================= RESPONSE ================= */
+if ($ok) {
+    echo json_encode([
+        "success" => true
+    ]);
+} else {
+    echo json_encode([
+        "success" => false,
+        "message" => "DATABASE_ERROR"
+    ]);
+}

@@ -239,19 +239,50 @@ function validateStudentFormOnSubmit() {
 
   return valid;
 }
+// ---------------- STEP-WISE VALIDATION HELPERS ----------------
 
-/*
-// If you ever want NON-Angular standalone usage, you can re-enable this:
+function validateStep1() {
+  const step1Ids = [
+    "dob",
+    "contact_no",
+    "address"
+  ];
 
-document.addEventListener("submit", function (event) {
-  const form = event.target;
-  if (!form || form.id !== "student-form") return;
+  let valid = true;
 
-  event.preventDefault();
-  const ok = validateStudentFormOnSubmit();
-  if (ok) {
-    alert("Form submitted successfully!");
-    form.reset();
+  // validate only step 1 fields
+  step1Ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && !validateField(el)) valid = false;
+  });
+
+  // gender (radio)
+  const genderSelected = document.querySelector('input[name="gender"]:checked');
+  if (!genderSelected) {
+    showError("gender_error", "Please select gender.");
+    valid = false;
   }
-});
-*/
+
+  return valid;
+}
+
+function validateStep2() {
+  const step2Ids = [
+    "ssc_school",
+    "ssc_board",
+    "ssc_percentage",
+    "hsc_school",
+    "hsc_board",
+    "hsc_percentage"
+  ];
+
+  let valid = true;
+
+  step2Ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && !validateField(el)) valid = false;
+  });
+
+  return valid;
+}
+

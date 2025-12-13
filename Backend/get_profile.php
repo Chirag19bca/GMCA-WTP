@@ -1,59 +1,49 @@
 <?php
-// Backend/get_profile.php
-header('Content-Type: application/json');
+header("Content-Type: application/json");
 session_start();
-
-require_once 'db.php';   // must define $conn or $con
-
-// support both $conn and $con
-if (!isset($conn)) {
-    if (isset($con)) {
-        $conn = $con;
-    } else {
-        echo json_encode("NOT_LOGGED_IN");
-        exit;
-    }
-}
+require_once "db.php";
 
 if (!isset($_SESSION['user_id'])) {
-    echo json_encode("NOT_LOGGED_IN");
+    echo "NOT_LOGGED_IN";
     exit;
 }
 
 $user_id = $_SESSION['user_id'];
 
-// Join users + student_profile + education_details
-$sql = "SELECT 
-            u.id,
-            u.enrollment_no,
-            sp.fname,
-            sp.lname,
-            sp.dob,
-            sp.gender,
-            sp.contact,
-            sp.address,
-            sp.email,
-            ed.ssc_school,
-            ed.ssc_board,
-            ed.ssc_percentage,
-            ed.hsc_school,
-            ed.hsc_board,
-            ed.hsc_percentage
-        FROM users u
-        LEFT JOIN student_profile sp ON sp.user_id = u.id
-        LEFT JOIN education_details ed ON ed.user_id = u.id
-        WHERE u.id = ?
-        LIMIT 1";
+$sql = "
+SELECT 
+    u.enrollment_no,
 
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
+    sp.fname,
+    sp.lname,
+    sp.email,
+    sp.dob,
+    sp.gender,
+    sp.contact,
+    sp.address,
 
-if ($result->num_rows === 0) {
-    echo json_encode("NOT_LOGGED_IN");
-    exit;
-}
+    ed.ssc_school,
+    ed.ssc_board,
+    ed.ssc_percentage,
 
-$profile = $result->fetch_assoc();
-echo json_encode($profile);
+    ed.hsc_school,
+    ed.hsc_board,
+    ed.hsc_percentage
+
+FROM users u
+JOIN student_profile sp 
+    ON u.id = sp.user_id
+
+LEFT JOIN education_details ed 
+    ON sp.user_id = ed.user_id
+
+WHERE u.id = ?
+";
+
+
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_bind_param($stmt, "i", $user_id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+
+echo json_encode(mysqli_fetch_assoc($result) ?: []);

@@ -2,7 +2,6 @@
 // Backend/login.php
 header('Content-Type: application/json');
 session_start();
-
 require_once 'db.php';   // must define $conn or $con
 
 // support both $conn and $con

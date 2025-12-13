@@ -37,12 +37,7 @@ app.config(function ($routeProvider) {
     .when("/profile", {
       templateUrl: "./pages/Profile.html?v=3",
       controller: "profileCtrl",
-    }) // v=2 to avoid cache
-    .when("/logout", {
-      // no separate page file, just a tiny inline template
-      template: "<p>Logging out...</p>",
-      controller: "logoutCtrl",
-    })
+    }) // v=3 to avoid cache
     .otherwise({ redirectTo: "/home" });
 });
 
@@ -78,70 +73,107 @@ app.controller("calcCtrl", function ($scope, $rootScope, $http, $location) {
   $http.get("../Backend/get_profile.php").then(
     function (res) {
       if (res.data === "NOT_LOGGED_IN") {
-        // User really not logged in -> just redirect quietly (no alert)
+        $rootScope.isLoggedIn = false;
         $location.path("/login");
       } else {
-        // Session is valid -> restore Angular state from profile
         $rootScope.isLoggedIn = true;
         $rootScope.currentUserName = (
           (res.data.fname || "") +
           " " +
           (res.data.lname || "")
         ).trim();
-        // stay on /calc, calculator will work normally
       }
     },
     function () {
-      // if server error, also send user to login (fallback)
       $location.path("/login");
     }
   );
 });
 
-
 // =============== STUDENT FORM CONTROLLER ===============
-app.controller("studentFormCtrl", function ($scope, $http, $location) {
-  $scope.step = 1;
-  $scope.form = {};
++app.controller(
+  "studentFormCtrl",
+  function ($scope, $http, $location, $rootScope) {
+    $scope.step = 1;
+    $scope.form = {};
+    $scope.isUpdateMode = false;
 
-  $scope.goStep = (n) => ($scope.step = n);
+    $scope.goStep = (n) => ($scope.step = n);
 
-  // Auto-fill from DB
-  $http.get("../Backend/get_profile.php").then((res) => {
-    if (res.data === "NOT_LOGGED_IN") {
-      $location.path("/login");
-      return;
-    }
-    const p = res.data;
-    $scope.form.enrollment_no = p.enrollment_no;
-    $scope.form.first_name = p.fname;
-    $scope.form.last_name = p.lname;
-    $scope.form.email = p.email;
-    $scope.form.dob = p.dob || "";
-    $scope.form.gender = p.gender || "";
-    $scope.form.contact_no = p.contact || "";
-    $scope.form.address = p.address || "";
-    $scope.form.ssc_school = p.ssc_school || "";
-    $scope.form.ssc_board = p.ssc_board || "";
-    $scope.form.ssc_percentage = p.ssc_percentage || "";
-    $scope.form.hsc_school = p.hsc_school || "";
-    $scope.form.hsc_board = p.hsc_board || "";
-    $scope.form.hsc_percentage = p.hsc_percentage || "";
-  });
-
-  $scope.submitForm = function () {
-    if (!validateStudentFormOnSubmit()) return;
-
-    $http.post("../Backend/studentform.php", $scope.form).then((res) => {
-      if (res.data.success) {
-        alert(res.data.message);
-        $location.path("/profile");
-      } else {
-        alert(res.data.message);
+    // Auto-fill from DB
+    $http.get("../Backend/get_profile.php").then((res) => {
+      if (res.data === "NOT_LOGGED_IN") {
+        $location.path("/login");
+        return;
       }
+      const p = res.data;
+      // If DOB exists, assume student already filled form
+      if (p.dob) {
+        $scope.isUpdateMode = true;
+      }
+      $scope.form.enrollment_no = p.enrollment_no;
+      $scope.form.first_name = p.fname;
+      $scope.form.last_name = p.lname;
+      $scope.form.email = p.email;
+      if (p.dob) {
+        // convert string -> Date object (AngularJS requires this)
+        $scope.form.dob = new Date(p.dob);
+      } else {
+        $scope.form.dob = null;
+      }
+
+      $scope.form.gender = p.gender || "";
+      $scope.form.contact_no = p.contact || "";
+      $scope.form.address = p.address || "";
+      $scope.form.ssc_school = p.ssc_school || "";
+      $scope.form.ssc_board = p.ssc_board || "";
+      $scope.form.ssc_percentage = p.ssc_percentage
+        ? Number(p.ssc_percentage)
+        : null;
+      $scope.form.hsc_school = p.hsc_school || "";
+      $scope.form.hsc_board = p.hsc_board || "";
+      $scope.form.hsc_percentage = p.hsc_percentage
+        ? Number(p.hsc_percentage)
+        : null;
     });
-  };
-});
+
+    $scope.submitForm = function () {
+      // 1️⃣ Validate STEP 1
+      if (!validateStep1()) {
+        $scope.step = 1; // move user to step 1
+        return;
+      }
+
+      // 2️⃣ Validate STEP 2
+      if (!validateStep2()) {
+        $scope.step = 2; // stay on step 2
+        return;
+      }
+
+      // 3️⃣ All valid → submit/update
+      $http.post("../Backend/studentform.php", $scope.form).then(
+        function (res) {
+          if (res.data && res.data.message === "SESSION_EXPIRED") {
+            alert("Session expired. Please login again.");
+            $location.path("/login");
+            return;
+          }
+
+          if (res.data && res.data.success === true) {
+            alert("Details updated successfully");
+            $rootScope.isLoggedIn = true; // ensure header stays in sync
+            $location.path("/profile");
+          } else {
+            alert("Submission failed.");
+          }
+        },
+        function () {
+          alert("Server error while submitting form.");
+        }
+      );
+    };
+  }
+);
 
 // =============== LOGIN CONTROLLER ===============
 app.controller("loginCtrl", function ($scope, $http, $location, $rootScope) {
@@ -197,8 +229,7 @@ app.controller("loginCtrl", function ($scope, $http, $location, $rootScope) {
             });
           } else {
             $scope.errorMsg =
-              data.message ||
-              "Invalid Enrollment No / Email / Password.";
+              data.message || "Invalid Enrollment No / Email / Password.";
           }
         }
 
@@ -239,13 +270,7 @@ app.controller("loginCtrl", function ($scope, $http, $location, $rootScope) {
 // =============== REGISTER CONTROLLER ===============
 app.controller(
   "registerCtrl",
-  function (
-    $scope,
-    $http,
-    $location,
-    $httpParamSerializerJQLike,
-    $rootScope
-  ) {
+  function ($scope, $http, $location, $httpParamSerializerJQLike, $rootScope) {
     $scope.register = {};
     $scope.successMsg = "";
     $scope.errorMsg = "";
@@ -300,9 +325,9 @@ app.controller(
             $scope.successMsg =
               (data && data.message) ||
               "Registration successful. Redirecting to login...";
-            $http.get("../backend/logout.php").finally(function () {
+            $http.get("../Backend/logout.php").finally(function () {
               $location.path("/login");
-              if(!$scope.$$phase) $scope.$apply();
+              if (!$scope.$$phase) $scope.$apply();
             });
           }
         },
@@ -314,17 +339,11 @@ app.controller(
   }
 );
 
-// =============== LOGOUT CONTROLLER ===============
-app.controller("logoutCtrl", function ($scope, $http, $location) {
-  $http.get("../Backend/logout.php").finally(function () {
-    $location.path("/login");
-  });
-});
-
 // =============== HEADER + NAVBAR CONTROLLER ===============
 app.controller("headerCtrl", function ($scope, $rootScope, $http, $location) {
   // guard so we don't run checkLogin many times
-  if (!$rootScope._authInit) $rootScope._authInit = {checking:false, done:false};
+  if (!$rootScope._authInit)
+    $rootScope._authInit = { checking: false, done: false };
 
   function applyProfile(profile) {
     $rootScope.isLoggedIn = true;
@@ -340,17 +359,20 @@ app.controller("headerCtrl", function ($scope, $rootScope, $http, $location) {
     if ($rootScope._authInit.checking) return;
     $rootScope._authInit.checking = true;
 
-    $http.get("../Backend/get_profile.php").then(function (res) {
-      if (res.data === "NOT_LOGGED_IN") {
-        $rootScope.isLoggedIn = false;
-        $rootScope.currentUserName = "";
-      } else {
-        applyProfile(res.data);
-      }
-    }).finally(function () {
-      $rootScope._authInit.checking = false;
-      $rootScope._authInit.done = true;
-    });
+    $http
+      .get("../Backend/get_profile.php")
+      .then(function (res) {
+        if (res.data === "NOT_LOGGED_IN") {
+          $rootScope.isLoggedIn = false;
+          $rootScope.currentUserName = "";
+        } else {
+          applyProfile(res.data);
+        }
+      })
+      .finally(function () {
+        $rootScope._authInit.checking = false;
+        $rootScope._authInit.done = true;
+      });
   }
 
   // run once on header init
@@ -375,9 +397,9 @@ app.controller("headerCtrl", function ($scope, $rootScope, $http, $location) {
       password: "Dhruvil@25",
     },
     Dhrumil: {
-      enrollment_no: "25GMCA34",
-      email: "dhrumil@example.com",
-      password: "password2",
+      enrollment_no: "255690694015",
+      email: "dhrumil@gmail.com",
+      password: "Dhrumil@12",
     },
     Chirag: {
       enrollment_no: "255690694051",
@@ -387,6 +409,25 @@ app.controller("headerCtrl", function ($scope, $rootScope, $http, $location) {
   };
 
   $scope.autoLogin = function (who) {
+    // If user already logged in
+    if ($rootScope.isLoggedIn) {
+      const currentName = ($rootScope.currentUserName || "").toLowerCase();
+      const clickedName = who.toLowerCase();
+
+      // Same user clicked
+      if (currentName.includes(clickedName)) {
+        alert(
+          "You are already logged in as " + $rootScope.currentUserName + "."
+        );
+      }
+      // Different user clicked
+      else {
+        alert("You should logout first to switch user.");
+      }
+      return; // STOP here
+    }
+
+    // ---------- NORMAL AUTO LOGIN ----------
     const cred = AUTO_LOGIN_PRESETS[who];
     if (!cred) {
       alert("Auto login user not configured: " + who);
@@ -396,12 +437,13 @@ app.controller("headerCtrl", function ($scope, $rootScope, $http, $location) {
     $http.post("../Backend/login.php", cred).then(
       function (response) {
         const data = response.data;
+
         if (!data || data.success === false) {
           alert((data && data.message) || "Auto login failed.");
           return;
         }
-        // re-sync with PHP session
-        checkLogin();
+
+        checkLogin(); // sync Angular with PHP session
         $location.path("/profile");
       },
       function () {

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 11, 2025 at 09:45 AM
+-- Generation Time: Dec 13, 2025 at 03:28 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -43,7 +43,7 @@ CREATE TABLE `education_details` (
 --
 
 INSERT INTO `education_details` (`id`, `user_id`, `ssc_school`, `ssc_board`, `ssc_percentage`, `hsc_school`, `hsc_board`, `hsc_percentage`) VALUES
-(1, 7, 'fdasfda', 'GSEB', 89.00, 'fdfad', 'GSEB', 90.00),
+(1, 7, 'fdasfda', 'CBSE', 89.00, 'fdfad', 'CBSE', 90.00),
 (2, 8, 'dfadsfda', 'GSEB', 98.00, 'fddfdd', 'GSEB', 99.00);
 
 -- --------------------------------------------------------
@@ -69,11 +69,12 @@ CREATE TABLE `student_profile` (
 --
 
 INSERT INTO `student_profile` (`id`, `user_id`, `fname`, `lname`, `dob`, `gender`, `contact`, `address`, `email`) VALUES
-(4, 7, 'Chirag', 'Sadhu', '2004-08-04', 'male', '9537412455', 'Khodiyar nagar na chhapra,chhaganbhai na chhapra,behrampura, ahmadabad city, Ahmedabad', 'chirag@gmail.com'),
+(4, 7, 'Chirag', 'Sadhu', '2004-08-05', 'male', '9537412455', 'Khodiyar nagar na chhapra,chhaganbhai na chhapra,behrampura, ahmadabad city, Ahmedabad', 'chirag@gmail.com'),
 (5, 8, 'Heet', 'Shah', '2004-08-04', 'male', '9587874124', 'dfadsfasedf', 'heet@gmail.com'),
 (6, 9, 'Dhruvil', 'Lodha', NULL, NULL, NULL, NULL, 'dhruvil@gmail.com'),
 (7, 10, 'Dhrumil', 'Jadav', NULL, NULL, NULL, NULL, 'dhrumil@gmail.com'),
-(8, 11, 'Aryan', 'Mehtani', NULL, NULL, NULL, NULL, 'aryan@gmail.com');
+(8, 11, 'Aryan', 'Mehtani', NULL, NULL, NULL, NULL, 'aryan@gmail.com'),
+(9, 12, 'aryan', 'gadhi', NULL, NULL, NULL, NULL, 'aryangadhi@gmail.com');
 
 -- --------------------------------------------------------
 
@@ -97,7 +98,8 @@ INSERT INTO `users` (`id`, `enrollment_no`, `email`, `password`) VALUES
 (8, '255690694005', 'heet@gmail.com', '$2y$10$oL6m1URaTHjG56NWhjnpX.iPsFQn5KHddU5PIdm5CkkBspKABjR0S'),
 (9, '255690694021', 'dhruvil@gmail.com', '$2y$10$glSnUH6X3a0PYlwjP0Un1uLmYxIUiHiAuHmhWFbp/i7oa9q2XKmWK'),
 (10, '255690694015', 'dhrumil@gmail.com', '$2y$10$GX0EYa/XGN7cZmTpQRpP9OCP/f1QTRm2ZBX1mYTQSOIwIofhZMu5.'),
-(11, '255690694028', 'aryan@gmail.com', '$2y$10$drhLVxMW2R/y5j8o0X5pTuWOYXf5mxRJwbCtRjGXJ.T1MRZV4Itbq');
+(11, '255690694028', 'aryan@gmail.com', '$2y$10$drhLVxMW2R/y5j8o0X5pTuWOYXf5mxRJwbCtRjGXJ.T1MRZV4Itbq'),
+(12, '255690694001', 'aryangadhi@gmail.com', '$2y$10$3F3zAMkBXxcIpxN914RNhOnfCJXOiGn1letSmkqPk6FnDjrMAh0aC');
 
 --
 -- Indexes for dumped tables
@@ -133,19 +135,19 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `education_details`
 --
 ALTER TABLE `education_details`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `student_profile`
 --
 ALTER TABLE `student_profile`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- Constraints for dumped tables

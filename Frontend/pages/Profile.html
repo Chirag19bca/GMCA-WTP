@@ -26,8 +26,8 @@
         </tr>
         <tr>
           <th>Date of Birth</th>
-          <td>{{profile.dob || '—'}}</td>
-        </tr>
+          <td>{{ profile.dob ? (profile.dob | date:'dd-MM-yyyy') : '—' }}</td>
+        </tr> 
         <tr>
           <th>Gender</th>
           <td>{{profile.gender || '—'}}</td>
@@ -80,7 +80,6 @@
       <div class="profile-actions">
         <a href="#!/studentform" class="btn-edit">Edit Details</a>
       </div>
-
     </div>
   </div>
 </div>
